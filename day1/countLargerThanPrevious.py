@@ -8,7 +8,7 @@ def __read_file_of_numbers(file):
             number_list = fe.read().splitlines()
             fe.close()
             print('Done reading from file!')
-            number_list = list(map(int, number_list)) # Truning it into list of ints
+            number_list = list(map(int, number_list)) # Turning list of strings into list of ints
             return number_list
     except IOError as error:
         print(error)
