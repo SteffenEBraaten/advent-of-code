@@ -1,4 +1,4 @@
-def caluclateDepthDeprecated(file):
+def caluclate_depth_deprecated(file):
     horizontalPos = 0
     verticalPos = 0
     with open(file, 'r') as fe:
@@ -13,7 +13,7 @@ def caluclateDepthDeprecated(file):
     fe.close()
     return horizontalPos * verticalPos
 
-def calculateDept(file):
+def calculate_depth(file):
     aim = 0
     verticalPos = 0
     horizontalPos = 0
@@ -33,10 +33,10 @@ def calculateDept(file):
 
 def main():
     file = 'input.txt'
-    deprecatedDepth = caluclateDepthDeprecated(file)
-    print(f'Deprecated depth calculation: {deprecatedDepth}\n')
+    deprecated_depth = caluclate_depth_deprecated(file)
+    print(f'Deprecated depth calculation: {deprecated_depth}\n')
 
-    depth = calculateDept(file)
+    depth = calculate_depth(file)
     print(f'Calculated depth: {depth}')
 
 main()
