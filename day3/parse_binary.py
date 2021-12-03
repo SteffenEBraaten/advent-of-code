@@ -23,8 +23,6 @@ def calculate_gamma_and_epsilon(two_dimensional_binary_array):
         else:
             gamma += "0"
             epsilon += "1"
-        zeroes = 0
-        ones = 0
     return gamma, epsilon
 
 
@@ -60,7 +58,6 @@ def calculate_c02(two_dimensional_binary_array):
         zeroes = []
         ones = []
         for j in range(len(c02)):
-            print(j)
             if c02[j][i] == "0":
                 zeroes.append(j)
             else:
