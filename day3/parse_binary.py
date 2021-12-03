@@ -3,7 +3,6 @@ def create_two_dimensional_array(file):
     with open(file) as fe:
         for line in fe:
             two_dimensional_array.append([str(i) for i in line.strip()])
-    fe.close()
     return two_dimensional_array
 
 
