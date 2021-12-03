@@ -7,8 +7,9 @@ def create_two_dimensional_array(file):
     return two_dimensional_array
 
 
-def calculate_gamma_rate(two_dimensional_binary_array):
+def calculate_gamma_and_epsilon(two_dimensional_binary_array):
     gamma = ""
+    epsilon = ""
     for i in range(len(two_dimensional_binary_array[0])):
         zeroes = 0
         ones = 0
@@ -19,27 +20,18 @@ def calculate_gamma_rate(two_dimensional_binary_array):
                 ones += 1
         if zeroes < ones:
             gamma += "1"
+            epsilon += "0"
         else:
             gamma += "0"
+            epsilon += "1"
         zeroes = 0
         ones = 0
-    return gamma
-
-
-def reverse_binary(binary_string: str):
-    reversed_binary_string = ""
-    for i in binary_string:
-        if i == "0":
-            reversed_binary_string += "1"
-        if i == "1":
-            reversed_binary_string += "0"
-    return reversed_binary_string
+    return gamma, epsilon
 
 
 def main():
     two_dimensional_binary_array = create_two_dimensional_array("input.txt")
-    gamma = calculate_gamma_rate(two_dimensional_binary_array)
-    epsilon = reverse_binary(gamma)
+    gamma, epsilon = calculate_gamma_and_epsilon(two_dimensional_binary_array)
 
     print(f'Power consumption: {int(epsilon, 2) * int(gamma, 2)}')
 
