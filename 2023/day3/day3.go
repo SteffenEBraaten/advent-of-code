@@ -30,13 +30,16 @@ func main() {
 		log.Fatal(err)
 	}
 
-	total, gearRatio, err := calculatePartNumbersSumAndGearRatio(symbolsMap, numbersMap)
-	if err != nil {
-		log.Fatal(err)
-	}
+	adjacentPartNumbersMap, err := getAdjacentPartNumbersForGears(symbolsMap, numbersMap)
+    if err != nil {
+        log.Fatal(err)
+    }
 
-	println("Sum of part numbers:", total)
-	println("Gear ratio:", gearRatio)
+    total := calculateTotalPartNumbers(adjacentPartNumbersMap)
+    gearRatio := calculateGearRatio(adjacentPartNumbersMap)
+
+    println("Sum of part numbers:", total)
+    println("Gear ratio:", gearRatio)
 }
 
 func processFile(file *os.File) (map[Coordinates]rune, map[Coordinates]NumberCell, error) {
@@ -69,28 +72,39 @@ func processLine(line string, y int, symbolsMap map[Coordinates]rune, numbersMap
 	}
 }
 
-func calculatePartNumbersSumAndGearRatio(symbolsMap map[Coordinates]rune, numbersMap map[Coordinates]NumberCell) (int, int, error) {
-	total := 0
-	gearRatio := 0
+func getAdjacentPartNumbersForGears(symbolsMap map[Coordinates]rune, numbersMap map[Coordinates]NumberCell) (map[Coordinates][]int, error) {
+    adjacentPartNumbersMap := make(map[Coordinates][]int)
+    for coord, char := range symbolsMap {
+        if isPossibleGear(char) {
+            partNumbers, err := getAdjacentPartNumbers(coord, numbersMap)
+            if err != nil {
+                return nil, err
+            }
+            // Store part numbers only if exactly 2 adjacent numbers are found
+            if len(partNumbers) == 2 {
+                adjacentPartNumbersMap[coord] = partNumbers
+            }
+        }
+    }
+    return adjacentPartNumbersMap, nil
+}
 
-	for coord, char := range symbolsMap {
-		partNumbers, err := getAdjacentPartNumbers(coord, numbersMap)
-		if err != nil {
-			return 0, 0, err
-		}		
+func calculateTotalPartNumbers(adjacentPartNumbersMap map[Coordinates][]int) int {
+    total := 0
+    for _, partNumbers := range adjacentPartNumbersMap {
+        for _, partNumber := range partNumbers {
+            total += partNumber
+        }
+    }
+    return total
+}
 
-		if isGear(char, partNumbers) {
-			gearRatio += (partNumbers[0] * partNumbers[1])
-		}
-
-		for _, partNumber := range partNumbers {
-			println(partNumber)
-			total += partNumber
-		}
-
-	}
-
-	return total, gearRatio, nil
+func calculateGearRatio(adjacentPartNumbersMap map[Coordinates][]int) int {
+    gearRatio := 0
+    for _, partNumbers := range adjacentPartNumbersMap {
+        gearRatio += partNumbers[0] * partNumbers[1]
+    }
+    return gearRatio
 }
 
 func getAdjacentPartNumbers(coord Coordinates, numbersMap map[Coordinates]NumberCell) ([]int, error) {
@@ -166,6 +180,6 @@ func isValidSymbol(char rune) bool {
 	return char != '.' && !unicode.IsDigit(char)
 }
 
-func isGear(char rune, partNumbers []int) bool {
-	return char == '*' && len(partNumbers) == 2
+func isPossibleGear(char rune) bool {
+	return char == '*'
 }
