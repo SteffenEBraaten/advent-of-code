@@ -30,12 +30,13 @@ func main() {
 		log.Fatal(err)
 	}
 
-	total, err := calculatePartNumbersSum(symbolsMap, numbersMap)
+	total, gearRatio, err := calculatePartNumbersSumAndGearRatio(symbolsMap, numbersMap)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	println("Sum of part numbers:", total)
+	println("Gear ratio:", gearRatio)
 }
 
 func processFile(file *os.File) (map[Coordinates]rune, map[Coordinates]NumberCell, error) {
@@ -68,33 +69,45 @@ func processLine(line string, y int, symbolsMap map[Coordinates]rune, numbersMap
 	}
 }
 
-func calculatePartNumbersSum(symbolsMap map[Coordinates]rune, numbersMap map[Coordinates]NumberCell) (int, error) {
+func calculatePartNumbersSumAndGearRatio(symbolsMap map[Coordinates]rune, numbersMap map[Coordinates]NumberCell) (int, int, error) {
 	total := 0
+	gearRatio := 0
 
-	for coord := range symbolsMap {
-		sum, err := sumAdjacentPartNumbers(coord, numbersMap)
+	for coord, char := range symbolsMap {
+		partNumbers, err := getAdjacentPartNumbers(coord, numbersMap)
 		if err != nil {
-			return 0, err
+			return 0, 0, err
+		}		
+
+		if isGear(char, partNumbers) {
+			gearRatio += (partNumbers[0] * partNumbers[1])
 		}
-		total += sum
+
+		for _, partNumber := range partNumbers {
+			println(partNumber)
+			total += partNumber
+		}
+
 	}
 
-	return total, nil
+	return total, gearRatio, nil
 }
 
-func sumAdjacentPartNumbers(coord Coordinates, numbersMap map[Coordinates]NumberCell) (int, error) {
-	sum := 0
+func getAdjacentPartNumbers(coord Coordinates, numbersMap map[Coordinates]NumberCell) ([]int, error) {
+	var partNumbers []int
 	adjacentCoords := getAdjacentCoordsForSymbol(coord)
 
 	for _, adjacentCoord := range adjacentCoords {
 		number, err := parseFullNumberAtCoord(adjacentCoord, numbersMap)
 		if err != nil {
-			return 0, err
+			return partNumbers, err
 		}
-		sum += number
+		if number != 0 {
+			partNumbers = append(partNumbers, number)
+		}
 	}
 
-	return sum, nil
+	return partNumbers, nil
 }
 
 func parseFullNumberAtCoord(coord Coordinates, numbersMap map[Coordinates]NumberCell) (int, error) {
@@ -151,4 +164,8 @@ func markNumberCellAsVisited(numberCell NumberCell) NumberCell {
 
 func isValidSymbol(char rune) bool {
 	return char != '.' && !unicode.IsDigit(char)
+}
+
+func isGear(char rune, partNumbers []int) bool {
+	return char == '*' && len(partNumbers) == 2
 }
