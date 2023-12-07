@@ -149,10 +149,6 @@ func markNumberCellAsVisited(numberCell NumberCell) NumberCell {
 	return copy
 }
 
-func convertStringToRune(s string) rune {
-	return []rune(s)[0]
-}
-
 func isValidSymbol(char rune) bool {
 	return char != '.' && !unicode.IsDigit(char)
 }
