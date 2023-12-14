@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"fmt"
 	"log"
 	"os"
 	"regexp"
@@ -57,8 +58,15 @@ func parseScratchCardLine(line string) ScratchCard {
 
 	splitNumbers := strings.SplitN(noPrefix, numberSeperator, 2)
 
-	winningNumbers := parseNumbers(splitNumbers[0])
-	numbers := parseNumbers(splitNumbers[1])
+	winningNumbers, err := parseNumbers(splitNumbers[0])
+	if err != nil {
+		log.Fatal(err, "Could not parse winning numbers from line: ", line)
+	}
+
+	numbers, err := parseNumbers(splitNumbers[1])
+	if err != nil {
+		log.Fatal(err, "Could not parse numbers from line: ", line)
+	}
 
 	numberOfAquiredWinningNumbers := getNumberOfAquiredWinningNumbers(winningNumbers, numbers)
 
@@ -70,39 +78,35 @@ func parseScratchCardLine(line string) ScratchCard {
 	return scratchcard
 }
 
-func getNumberOfAquiredWinningNumbers(winningNumbers []int, numbers []int) int {
-	var numberOfAquiredWinningNumbers int
-
-	for _, winningNumber := range winningNumbers {
-		for _, number := range numbers {
-			if winningNumber == number {
-				numberOfAquiredWinningNumbers++
-			}
-		}
+func getNumberOfAquiredWinningNumbers(winningNumbers, numbers []int) int {
+	winNumsMap := make(map[int]bool)
+	for _, num := range winningNumbers {
+		winNumsMap[num] = true
 	}
 
-	return numberOfAquiredWinningNumbers
+	count := 0
+	for _, num := range numbers {
+		if winNumsMap[num] {
+			count++
+		}
+	}
+	return count
 }
 
-func parseNumbers(numbers string) []int {
+func parseNumbers(numbers string) ([]int, error) {
 	numberStrings := strings.Split(numbers, space)
-
 	var numberInts []int
 
 	for _, numberString := range numberStrings {
 		if numberString != "" {
 			number, err := strconv.Atoi(numberString)
-
 			if err != nil {
-				log.Fatal(err)
+				return nil, fmt.Errorf("failed to parse number: %v", err)
 			}
-
 			numberInts = append(numberInts, number)
 		}
 	}
-
-	return numberInts
-
+	return numberInts, nil
 }
 
 func removePrefix(line string) string {
