@@ -13,6 +13,7 @@ import (
 type ScratchCard struct {
 	id int
 	numberOfAquiredWinningNumbers int
+	copies int
 }
 
 const numberSeperator = "|"
@@ -34,8 +35,27 @@ func main() {
 		totalPoints += calculatePoints(scratchCard.numberOfAquiredWinningNumbers)
 	}
 
-	println("Total points:", totalPoints)
+	for _, scratchCard := range scratchCards {
+		if scratchCard.copies == 0 && scratchCard.numberOfAquiredWinningNumbers > 0 {
+			for i := 1; scratchCard.numberOfAquiredWinningNumbers > i; i++ {
+				scratchCards[scratchCard.id - 1 + i].copies += 1
+			}
+		}
+		if scratchCard.copies > 0 && scratchCard.numberOfAquiredWinningNumbers > 0 {
+			for i := 1; scratchCard.numberOfAquiredWinningNumbers > i; i++ {
+				scratchCards[scratchCard.id - 1 + i].copies += 1 * scratchCard.copies
+			}
+		}
+		println(scratchCard.copies)
+	}
 
+	numberOfCopyCards := 0
+	for _, scratchCard := range scratchCards {
+		numberOfCopyCards += scratchCard.copies
+	}
+
+	println("Total points:", totalPoints)
+	println("Total number of cards:", len(scratchCards) + numberOfCopyCards)
 }
 
 func parseScratchcardFile(file *os.File) []ScratchCard {
