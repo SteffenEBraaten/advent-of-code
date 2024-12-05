@@ -14,7 +14,7 @@ import (
 func main() {
 	flag.Parse()
 
-	file, err := os.Open("input.txt")
+	file, err := os.Open("../input/day1.txt")
 	if err != nil {
 		log.Fatal(err)
 		file.Close()
